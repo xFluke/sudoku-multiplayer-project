@@ -17,26 +17,26 @@ public class Cell : Selectable, IPointerClickHandler, IDeselectHandler
     [SerializeField] private int index;
     public int Index { get { return index; } set { index = value; } }
 
-    [SerializeField] private bool notesActive = false;
+    [SerializeField] private bool controlHeld = false;
     private List<int> pencilMarks = new List<int>();
 
     new private void Start() {
         GameEvents.onClearCell += ClearCell;
         GameEvents.onNotesActive += SetNotesActive;
         GameEvents.onInputNumber += InputNumber;
-        GameEvents.onCellSelected += Deselect;
+        GameEvents.onResetCellSelection += Deselect;
     }
 
     private void SetNotesActive(bool b) {
 
-        notesActive = b;
+        controlHeld = b;
     }
 
     private void InputNumber(int num) {
         if (!selected)
             return;
 
-        if (!notesActive) {
+        if (!controlHeld) {
             numberText.text = num.ToString();
         }
         else {
@@ -63,9 +63,10 @@ public class Cell : Selectable, IPointerClickHandler, IDeselectHandler
         colors = cb;
     }
 
-    public void Deselect(int selectedIndex) {
-        if (selectedIndex != index) {
+    public void Deselect(HashSet<int> selectedIndices) {
+        if (!selectedIndices.Contains(index)) {
             selected = false;
+            InstantClearState();
         }
     }
 
@@ -74,12 +75,15 @@ public class Cell : Selectable, IPointerClickHandler, IDeselectHandler
             return;
 
         selected = true;
-        GameEvents.CellSelected(index);
+        GameEvents.CellSelected(index, controlHeld);
     }
 
     public new void OnDeselect(BaseEventData eventData) {
-        GameEvents.CellSelected(-1);
-        InstantClearState();
+        Debug.Log(eventData.currentInputModule);
+        if (!controlHeld) {
+            GameEvents.CellSelected(-1);
+            InstantClearState();
+        }
     }
 
     

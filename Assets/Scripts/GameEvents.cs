@@ -11,11 +11,11 @@ public class GameEvents : MonoBehaviour
         onClearCell();
     }
 
-    public delegate void CellSelectedHandler(int cellIndex);
+    public delegate void CellSelectedHandler(int cellIndex, bool addingNew = false);
     public static event CellSelectedHandler onCellSelected;
 
-    public static void CellSelected(int cellIndex) {
-        onCellSelected(cellIndex);
+    public static void CellSelected(int cellIndex, bool addingNew = false) {
+        onCellSelected(cellIndex, addingNew);
     }
 
     public delegate void CellHoveredHandler(int cellIndex);
@@ -37,6 +37,13 @@ public class GameEvents : MonoBehaviour
 
     public static void InputNumber(int num) {
         onInputNumber(num);
+    }
+
+    public delegate void ResetCellSelectionHandler(HashSet<int> indices);
+    public static event ResetCellSelectionHandler onResetCellSelection;
+
+    public static void ResetCellSelection(HashSet<int> indices) {
+        onResetCellSelection(indices);
     }
 
 }

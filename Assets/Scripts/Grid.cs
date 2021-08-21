@@ -19,6 +19,7 @@ public class Grid : MonoBehaviour
 
     private List<GameObject> cells = new List<GameObject>();
 
+    private HashSet<int> selectedIndices = new HashSet<int>();
     private HashSet<int> highlightedCellsIndex = new HashSet<int>();
 
     private void Start() {
@@ -72,18 +73,57 @@ public class Grid : MonoBehaviour
         }
     }
 
-    public void HighlightAffectedCells(int index) {
-        ResetHighlights();
+    public void HighlightAffectedCells(int index, bool addingNew) {
+        if (!addingNew) {
+            selectedIndices.Clear();
+            selectedIndices.Add(index);
+            GameEvents.ResetCellSelection(selectedIndices);
 
-        if (index >= 0) {
-            Debug.Log("Passed in Index: " + index);
-            HighlightRow(index);
-            HighlightColumn(index);
-            HighlightBlock(index);
+            ResetHighlights();
+
+            if (index >= 0) {
+                highlightedCellsIndex = GetAffectedCells(index);
+                HighlightMarkedCells();
+            }
+        }
+        else {
+            selectedIndices.Add(index);
+            GameEvents.ResetCellSelection(selectedIndices);
+
+            if (highlightedCellsIndex.Count == 0) {
+                highlightedCellsIndex = GetAffectedCells(index);
+                HighlightMarkedCells();
+                return;
+            }
+            HashSet<int> affectedCells = GetAffectedCells(index);
+
+            HashSet<int> copy = new HashSet<int>(highlightedCellsIndex);
+            copy.IntersectWith(affectedCells);
+
+            ResetHighlights();
+
+            highlightedCellsIndex = new HashSet<int>(copy);
+            HighlightMarkedCells();
         }
     }
 
-   
+    private HashSet<int> GetAffectedCells(int index) {
+        HashSet<int> affectedCells = new HashSet<int>();
+
+        MarkRowForHighlight(index, affectedCells);
+        MarkColumnForHighlight(index, affectedCells);
+        MarkBlockForHighlight(index, affectedCells);
+
+        return affectedCells;
+    }
+
+    private void HighlightMarkedCells() {
+        foreach (int index in highlightedCellsIndex) {
+            ColorBlock cb = cells[index].GetComponent<Cell>().colors;
+            cb.normalColor = new Color32(177, 179, 255, 255);
+            cells[index].GetComponent<Cell>().colors = cb;
+        }
+     }
 
     private void ResetHighlights() {
         foreach (int cellIndex in highlightedCellsIndex) {
@@ -92,42 +132,37 @@ public class Grid : MonoBehaviour
         highlightedCellsIndex.Clear();
     }
 
-    public void HighlightRow(int index) {
+    public void MarkRowForHighlight(int index, HashSet<int> highlightIndices) {
         int rowNumber = index / 9;
         for (int i = rowNumber * 9; i < rowNumber * 9 + 9; i++) {
-            HighlightCell(i);
+            MarlCellForHighlight(i, highlightIndices);
         }
     }
 
-    public void HighlightColumn(int index) {
+    public void MarkColumnForHighlight(int index, HashSet<int> highlightIndices) {
         // Highlight cells above
 
         for (int i = index - 9; i >= 0; i-=9) {
-            HighlightCell(i);
+            MarlCellForHighlight(i, highlightIndices);
         }
 
         // Highlight cells below
         for (int i = index + 9; i < 81; i+=9) {
-            HighlightCell(i);
+            MarlCellForHighlight(i, highlightIndices);
         }
     }
 
-    private void HighlightCell(int index) {
-        if (!highlightedCellsIndex.Contains(index)) {
-            ColorBlock cb = cells[index].GetComponent<Cell>().colors;
-            cb.normalColor = new Color32(177, 179, 255, 255);
-            cells[index].GetComponent<Cell>().colors = cb;
-            highlightedCellsIndex.Add(index);
-        }
+    private void MarlCellForHighlight(int index, HashSet<int> highlightIndices) {
+        highlightIndices.Add(index);
     }
 
-    private void HighlightBlock(int index) {
+    private void MarkBlockForHighlight(int index, HashSet<int> highlightIndices) {
         int indexOfCenter = FindCenter(index);
 
         for (int i = indexOfCenter - 1 - 9; i <= indexOfCenter - 1 + 9; i+=9) {
-            HighlightCell(i);
+            MarlCellForHighlight(i, highlightIndices);
             for (int j = i; j < i + 3 ; j++) {
-                HighlightCell(j);
+                MarlCellForHighlight(j, highlightIndices);
             }
         }
     }
