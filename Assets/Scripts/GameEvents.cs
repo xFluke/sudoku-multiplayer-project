@@ -46,4 +46,10 @@ public class GameEvents : MonoBehaviour
         onResetCellSelection(indices);
     }
 
+    public delegate void ShowCellsWithSameNumberHandler(int num);
+    public static event ShowCellsWithSameNumberHandler onShowCellWithSameNumber;
+
+    public static void ShowCellsWithSameNumber(int num) {
+        onShowCellWithSameNumber(num);
+    }
 }

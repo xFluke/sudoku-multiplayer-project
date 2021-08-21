@@ -17,6 +17,12 @@ public class Cell : Selectable, IPointerClickHandler, IDeselectHandler
     [SerializeField] private int index;
     public int Index { get { return index; } set { index = value; } }
 
+    [SerializeField] private int number = 0;
+    public int Number { get { return number; } set { number = value; } }
+
+
+    private bool blockInput = false;
+
     [SerializeField] private bool controlHeld = false;
     private List<int> pencilMarks = new List<int>();
 
@@ -25,6 +31,22 @@ public class Cell : Selectable, IPointerClickHandler, IDeselectHandler
         GameEvents.onNotesActive += SetNotesActive;
         GameEvents.onInputNumber += InputNumber;
         GameEvents.onResetCellSelection += Deselect;
+        GameEvents.onShowCellWithSameNumber += ShowCellWithSameNumber;
+    }
+
+    private void ShowCellWithSameNumber(int num) {
+        if (number == 0)
+            return;
+
+        if (num < 0) {
+            Unhighlight();
+        }
+
+        if (number == num) {
+            ColorBlock cb = colors;
+            cb.normalColor = new Color32(67, 163, 212, 255);
+            colors = cb;
+        }
     }
 
     private void SetNotesActive(bool b) {
@@ -33,7 +55,7 @@ public class Cell : Selectable, IPointerClickHandler, IDeselectHandler
     }
 
     private void InputNumber(int num) {
-        if (!selected)
+        if (!selected || blockInput)
             return;
 
         if (!controlHeld) {
@@ -53,7 +75,10 @@ public class Cell : Selectable, IPointerClickHandler, IDeselectHandler
     }
     public void SetNumber(int num) {
         if (num > 0) {
+            number = num;
             numberText.text = num.ToString();
+            numberText.fontStyle = FontStyle.Bold;
+            blockInput = true;
         }
     }
 
@@ -79,10 +104,10 @@ public class Cell : Selectable, IPointerClickHandler, IDeselectHandler
     }
 
     public new void OnDeselect(BaseEventData eventData) {
-        Debug.Log(eventData.currentInputModule);
         if (!controlHeld) {
             GameEvents.CellSelected(-1);
-            InstantClearState();
+            GameEvents.ShowCellsWithSameNumber(-1);
+            GameEvents.ResetCellSelection(new HashSet<int>());
         }
     }
 

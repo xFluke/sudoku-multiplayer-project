@@ -75,13 +75,15 @@ public class Grid : MonoBehaviour
 
     public void HighlightAffectedCells(int index, bool addingNew) {
         if (!addingNew) {
-            selectedIndices.Clear();
-            selectedIndices.Add(index);
-            GameEvents.ResetCellSelection(selectedIndices);
-
             ResetHighlights();
 
             if (index >= 0) {
+                selectedIndices.Clear();
+                selectedIndices.Add(index);
+                GameEvents.ResetCellSelection(selectedIndices);
+                GameEvents.ShowCellsWithSameNumber(cells[index].GetComponent<Cell>().Number);
+
+
                 highlightedCellsIndex = GetAffectedCells(index);
                 HighlightMarkedCells();
             }
@@ -89,6 +91,10 @@ public class Grid : MonoBehaviour
         else {
             selectedIndices.Add(index);
             GameEvents.ResetCellSelection(selectedIndices);
+
+            if (selectedIndices.Count == 1) {
+                GameEvents.ShowCellsWithSameNumber(cells[index].GetComponent<Cell>().Number);
+            }
 
             if (highlightedCellsIndex.Count == 0) {
                 highlightedCellsIndex = GetAffectedCells(index);
