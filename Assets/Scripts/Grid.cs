@@ -81,20 +81,16 @@ public class Grid : MonoBehaviour
                 selectedIndices.Clear();
                 selectedIndices.Add(index);
                 GameEvents.ResetCellSelection(selectedIndices);
-                GameEvents.ShowCellsWithSameNumber(cells[index].GetComponent<Cell>().Number);
-
-
+               
                 highlightedCellsIndex = GetAffectedCells(index);
                 HighlightMarkedCells();
+
+                GameEvents.ShowCellsWithSameNumber(cells[index].GetComponent<Cell>().Number);
             }
         }
         else {
             selectedIndices.Add(index);
             GameEvents.ResetCellSelection(selectedIndices);
-
-            if (selectedIndices.Count == 1) {
-                GameEvents.ShowCellsWithSameNumber(cells[index].GetComponent<Cell>().Number);
-            }
 
             if (highlightedCellsIndex.Count == 0) {
                 highlightedCellsIndex = GetAffectedCells(index);
@@ -110,6 +106,10 @@ public class Grid : MonoBehaviour
 
             highlightedCellsIndex = new HashSet<int>(copy);
             HighlightMarkedCells();
+
+            if (selectedIndices.Count == 1) {
+                GameEvents.ShowCellsWithSameNumber(cells[index].GetComponent<Cell>().Number);
+            }
         }
     }
 

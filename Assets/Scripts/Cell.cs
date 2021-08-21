@@ -60,6 +60,8 @@ public class Cell : Selectable, IPointerClickHandler, IDeselectHandler
 
         if (!controlHeld) {
             numberText.text = num.ToString();
+            number = num;
+            GameEvents.ShowCellsWithSameNumber(number);
         }
         else {
             AddPencilMark(num);
