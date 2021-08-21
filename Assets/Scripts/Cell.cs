@@ -86,8 +86,7 @@ public class Cell : Selectable, IPointerClickHandler, IDeselectHandler
     }
 
     private void ClearCell() {
-        Debug.Log("uh");
-        if (selected) {
+        if (selected && !blockInput) {
             numberText.text = "";
             number = 0;
         }
