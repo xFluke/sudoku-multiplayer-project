@@ -16,4 +16,8 @@ public class InputManager : MonoBehaviour
 
         GameEvents.InputNumber(numKeyValue);
     }
+
+    public void OnClearCell(InputAction.CallbackContext ctx) {
+        GameEvents.ClearCell();
+    }
 }

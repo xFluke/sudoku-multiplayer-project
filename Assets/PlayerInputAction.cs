@@ -33,6 +33,14 @@ public class @PlayerInputAction : IInputActionCollection, IDisposable
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """"
+                },
+                {
+                    ""name"": ""ClearCell"",
+                    ""type"": ""Button"",
+                    ""id"": ""3a71fde5-0f72-45ba-9fdb-40a15eb2ffe3"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """"
                 }
             ],
             ""bindings"": [
@@ -145,6 +153,28 @@ public class @PlayerInputAction : IInputActionCollection, IDisposable
                     ""action"": ""InputNumber"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""4750c20d-ac3c-4bd7-82b0-fe37258ad821"",
+                    ""path"": ""<Keyboard>/backspace"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ClearCell"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""d14c8131-90de-4470-8a89-7cf71e84292f"",
+                    ""path"": ""<Keyboard>/delete"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ClearCell"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -155,6 +185,7 @@ public class @PlayerInputAction : IInputActionCollection, IDisposable
         m_Gameplay = asset.FindActionMap("Gameplay", throwIfNotFound: true);
         m_Gameplay_EnableNotes = m_Gameplay.FindAction("EnableNotes", throwIfNotFound: true);
         m_Gameplay_InputNumber = m_Gameplay.FindAction("InputNumber", throwIfNotFound: true);
+        m_Gameplay_ClearCell = m_Gameplay.FindAction("ClearCell", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -206,12 +237,14 @@ public class @PlayerInputAction : IInputActionCollection, IDisposable
     private IGameplayActions m_GameplayActionsCallbackInterface;
     private readonly InputAction m_Gameplay_EnableNotes;
     private readonly InputAction m_Gameplay_InputNumber;
+    private readonly InputAction m_Gameplay_ClearCell;
     public struct GameplayActions
     {
         private @PlayerInputAction m_Wrapper;
         public GameplayActions(@PlayerInputAction wrapper) { m_Wrapper = wrapper; }
         public InputAction @EnableNotes => m_Wrapper.m_Gameplay_EnableNotes;
         public InputAction @InputNumber => m_Wrapper.m_Gameplay_InputNumber;
+        public InputAction @ClearCell => m_Wrapper.m_Gameplay_ClearCell;
         public InputActionMap Get() { return m_Wrapper.m_Gameplay; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -227,6 +260,9 @@ public class @PlayerInputAction : IInputActionCollection, IDisposable
                 @InputNumber.started -= m_Wrapper.m_GameplayActionsCallbackInterface.OnInputNumber;
                 @InputNumber.performed -= m_Wrapper.m_GameplayActionsCallbackInterface.OnInputNumber;
                 @InputNumber.canceled -= m_Wrapper.m_GameplayActionsCallbackInterface.OnInputNumber;
+                @ClearCell.started -= m_Wrapper.m_GameplayActionsCallbackInterface.OnClearCell;
+                @ClearCell.performed -= m_Wrapper.m_GameplayActionsCallbackInterface.OnClearCell;
+                @ClearCell.canceled -= m_Wrapper.m_GameplayActionsCallbackInterface.OnClearCell;
             }
             m_Wrapper.m_GameplayActionsCallbackInterface = instance;
             if (instance != null)
@@ -237,6 +273,9 @@ public class @PlayerInputAction : IInputActionCollection, IDisposable
                 @InputNumber.started += instance.OnInputNumber;
                 @InputNumber.performed += instance.OnInputNumber;
                 @InputNumber.canceled += instance.OnInputNumber;
+                @ClearCell.started += instance.OnClearCell;
+                @ClearCell.performed += instance.OnClearCell;
+                @ClearCell.canceled += instance.OnClearCell;
             }
         }
     }
@@ -245,5 +284,6 @@ public class @PlayerInputAction : IInputActionCollection, IDisposable
     {
         void OnEnableNotes(InputAction.CallbackContext context);
         void OnInputNumber(InputAction.CallbackContext context);
+        void OnClearCell(InputAction.CallbackContext context);
     }
 }

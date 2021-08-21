@@ -7,7 +7,6 @@ using UnityEngine.EventSystems;
 
 public class Cell : Selectable, IPointerClickHandler, IDeselectHandler
 { 
-    InputField inputField;
     [SerializeField] Text numberText;
 
     [SerializeField] Transform notesObject;
@@ -19,6 +18,11 @@ public class Cell : Selectable, IPointerClickHandler, IDeselectHandler
 
     [SerializeField] private int number = 0;
     public int Number { get { return number; } set { number = value; } }
+
+    private bool highlighted = false;
+
+    public bool Highlighted {  get { return highlighted; } set { highlighted = value; } }
+
 
 
     private bool blockInput = false;
@@ -47,6 +51,16 @@ public class Cell : Selectable, IPointerClickHandler, IDeselectHandler
             cb.normalColor = new Color32(67, 163, 212, 255);
             colors = cb;
         }
+        else {
+            if (highlighted) {
+                ColorBlock cb = colors;
+                cb.normalColor = new Color32(177, 179, 255, 255);
+                colors = cb;
+            }
+            else {
+                Unhighlight();
+            }
+        }
     }
 
     private void SetNotesActive(bool b) {
@@ -72,8 +86,12 @@ public class Cell : Selectable, IPointerClickHandler, IDeselectHandler
     }
 
     private void ClearCell() {
-        if (selected)
-            inputField.text = "";
+        Debug.Log("uh");
+        if (selected) {
+            numberText.text = "";
+            number = 0;
+        }
+
     }
     public void SetNumber(int num) {
         if (num > 0) {
@@ -88,6 +106,8 @@ public class Cell : Selectable, IPointerClickHandler, IDeselectHandler
         ColorBlock cb = colors;
         cb.normalColor = Color.white;
         colors = cb;
+
+        highlighted = false;
     }
 
     public void Deselect(HashSet<int> selectedIndices) {

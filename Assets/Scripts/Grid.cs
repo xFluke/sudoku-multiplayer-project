@@ -128,6 +128,8 @@ public class Grid : MonoBehaviour
             ColorBlock cb = cells[index].GetComponent<Cell>().colors;
             cb.normalColor = new Color32(177, 179, 255, 255);
             cells[index].GetComponent<Cell>().colors = cb;
+
+            cells[index].GetComponent<Cell>().Highlighted = true;
         }
      }
 

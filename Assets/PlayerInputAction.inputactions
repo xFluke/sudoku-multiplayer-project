@@ -20,6 +20,14 @@
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": ""
+                },
+                {
+                    "name": "ClearCell",
+                    "type": "Button",
+                    "id": "3a71fde5-0f72-45ba-9fdb-40a15eb2ffe3",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
                 }
             ],
             "bindings": [
@@ -130,6 +138,28 @@
                     "processors": "",
                     "groups": "",
                     "action": "InputNumber",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "4750c20d-ac3c-4bd7-82b0-fe37258ad821",
+                    "path": "<Keyboard>/backspace",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "ClearCell",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "d14c8131-90de-4470-8a89-7cf71e84292f",
+                    "path": "<Keyboard>/delete",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "ClearCell",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
