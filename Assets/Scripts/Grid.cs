@@ -75,10 +75,12 @@ public class Grid : MonoBehaviour
     public void HighlightAffectedCells(int index) {
         ResetHighlights();
 
-        Debug.Log("Passed in Index: " + index);
-        HighlightRow(index);
-        HighlightColumn(index);
-        HighlightBlock(index);
+        if (index >= 0) {
+            Debug.Log("Passed in Index: " + index);
+            HighlightRow(index);
+            HighlightColumn(index);
+            HighlightBlock(index);
+        }
     }
 
    
@@ -112,9 +114,9 @@ public class Grid : MonoBehaviour
 
     private void HighlightCell(int index) {
         if (!highlightedCellsIndex.Contains(index)) {
-            ColorBlock cb = cells[index].GetComponent<InputField>().colors;
+            ColorBlock cb = cells[index].GetComponent<Cell>().colors;
             cb.normalColor = new Color32(177, 179, 255, 255);
-            cells[index].GetComponent<InputField>().colors = cb;
+            cells[index].GetComponent<Cell>().colors = cb;
             highlightedCellsIndex.Add(index);
         }
     }

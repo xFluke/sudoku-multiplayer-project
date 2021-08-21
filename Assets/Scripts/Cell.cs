@@ -5,9 +5,10 @@ using UnityEngine.UI;
 using System;
 using UnityEngine.EventSystems;
 
-public class Cell : MonoBehaviour, ISelectHandler
-{
+public class Cell : Selectable, IPointerClickHandler, IDeselectHandler
+{ 
     InputField inputField;
+    [SerializeField] Text numberText;
 
     [SerializeField] Transform notesObject;
     [SerializeField] private bool selected = false;
@@ -16,16 +17,13 @@ public class Cell : MonoBehaviour, ISelectHandler
     [SerializeField] private int index;
     public int Index { get { return index; } set { index = value; } }
 
-    private bool notesActive = false;
+    [SerializeField] private bool notesActive = false;
     private List<int> pencilMarks = new List<int>();
 
-
-    private void Awake() {
-        inputField = GetComponent<InputField>();
-        inputField.onValidateInput += delegate (string input, int charIndex, char addedChar) { return ValidateInput(addedChar); };
+    new private void Start() {
         GameEvents.onClearCell += ClearCell;
         GameEvents.onNotesActive += SetNotesActive;
-        GameEvents.onInputNumber += AddPencilMark;
+        GameEvents.onInputNumber += InputNumber;
         GameEvents.onCellSelected += Deselect;
     }
 
@@ -34,28 +32,19 @@ public class Cell : MonoBehaviour, ISelectHandler
         notesActive = b;
     }
 
-    private char ValidateInput(char addedChar) {
-        // Check if user input is between 1-9
-        if (Char.GetNumericValue(addedChar) > 0 && Char.GetNumericValue(addedChar) < 10) {
-            if (inputField.text.Length == 1) {
-                inputField.text = "";
-            }
+    private void InputNumber(int num) {
+        if (!selected)
+            return;
 
-            return addedChar;
+        if (!notesActive) {
+            numberText.text = num.ToString();
         }
         else {
-            return '\0';
+            AddPencilMark(num);
         }
     }
-
     private void AddPencilMark(int num) {
-        if (selected) {
-            Debug.Log("hi");
-        }
-
-        if (selected && notesActive) {
-            notesObject.GetChild(num - 1).gameObject.SetActive(true);
-        }
+        notesObject.GetChild(num - 1).gameObject.SetActive(true);
     }
 
     private void ClearCell() {
@@ -64,20 +53,14 @@ public class Cell : MonoBehaviour, ISelectHandler
     }
     public void SetNumber(int num) {
         if (num > 0) {
-            inputField.text = num.ToString();
-            inputField.readOnly = true;
+            numberText.text = num.ToString();
         }
     }
 
     public void Unhighlight() {
-        ColorBlock cb = inputField.colors;
+        ColorBlock cb = colors;
         cb.normalColor = Color.white;
-        inputField.colors = cb;
-    }
-
-    public void OnSelect(BaseEventData eventData) {
-        selected = true;
-        GameEvents.CellSelected(index);
+        colors = cb;
     }
 
     public void Deselect(int selectedIndex) {
@@ -85,4 +68,19 @@ public class Cell : MonoBehaviour, ISelectHandler
             selected = false;
         }
     }
+
+    public void OnPointerClick(PointerEventData eventData) {
+        if (selected)
+            return;
+
+        selected = true;
+        GameEvents.CellSelected(index);
+    }
+
+    public new void OnDeselect(BaseEventData eventData) {
+        GameEvents.CellSelected(-1);
+        InstantClearState();
+    }
+
+    
 }
