@@ -17,4 +17,26 @@ public class GameEvents : MonoBehaviour
     public static void CellSelected(int cellIndex) {
         onCellSelected(cellIndex);
     }
+
+    public delegate void CellHoveredHandler(int cellIndex);
+    public static event CellHoveredHandler onCellHovered;
+
+    public static void CellHovered(int cellIndex) {
+        onCellHovered(cellIndex);
+    }
+
+    public delegate void NotesActiveHandler(bool active);
+    public static event NotesActiveHandler onNotesActive;
+
+    public static void NotesActive(bool active) {
+        onNotesActive(active);
+    }
+
+    public delegate void InputNumberHandler(int num);
+    public static event InputNumberHandler onInputNumber;
+
+    public static void InputNumber(int num) {
+        onInputNumber(num);
+    }
+
 }

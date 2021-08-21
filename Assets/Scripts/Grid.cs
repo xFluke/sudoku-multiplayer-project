@@ -2,11 +2,13 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Grid : MonoBehaviour
 {
     private const int COLUMNS = 9;
     private const int ROWS = 9;
+    private int[] BLOCK_CENTER_INDICES = new int[]{ 10, 13, 16, 37, 40, 43, 64, 67, 70 };
 
     private float cellOffset = 3.0f;
     private float cellScale = 0.9f;
@@ -17,7 +19,10 @@ public class Grid : MonoBehaviour
 
     private List<GameObject> cells = new List<GameObject>();
 
+    private HashSet<int> highlightedCellsIndex = new HashSet<int>();
+
     private void Start() {
+        GameEvents.onCellSelected += HighlightAffectedCells;
         InitializeGrid();
     }
 
@@ -25,7 +30,6 @@ public class Grid : MonoBehaviour
         InstantiateCells();
         LoadPuzzle();
     }
-
     private void LoadPuzzle() {
         string testPuzzle = "000000002001006005300004000290400300000020061500700000050000900904001050700000003";
 
@@ -66,5 +70,87 @@ public class Grid : MonoBehaviour
                 numOfHorizontalSeperators++;
             }
         }
+    }
+
+    public void HighlightAffectedCells(int index) {
+        ResetHighlights();
+
+        Debug.Log("Passed in Index: " + index);
+        HighlightRow(index);
+        HighlightColumn(index);
+        HighlightBlock(index);
+    }
+
+   
+
+    private void ResetHighlights() {
+        foreach (int cellIndex in highlightedCellsIndex) {
+            cells[cellIndex].GetComponent<Cell>().Unhighlight();
+        }
+        highlightedCellsIndex.Clear();
+    }
+
+    public void HighlightRow(int index) {
+        int rowNumber = index / 9;
+        for (int i = rowNumber * 9; i < rowNumber * 9 + 9; i++) {
+            HighlightCell(i);
+        }
+    }
+
+    public void HighlightColumn(int index) {
+        // Highlight cells above
+
+        for (int i = index - 9; i >= 0; i-=9) {
+            HighlightCell(i);
+        }
+
+        // Highlight cells below
+        for (int i = index + 9; i < 81; i+=9) {
+            HighlightCell(i);
+        }
+    }
+
+    private void HighlightCell(int index) {
+        if (!highlightedCellsIndex.Contains(index)) {
+            ColorBlock cb = cells[index].GetComponent<InputField>().colors;
+            cb.normalColor = new Color32(177, 179, 255, 255);
+            cells[index].GetComponent<InputField>().colors = cb;
+            highlightedCellsIndex.Add(index);
+        }
+    }
+
+    private void HighlightBlock(int index) {
+        int indexOfCenter = FindCenter(index);
+
+        for (int i = indexOfCenter - 1 - 9; i <= indexOfCenter - 1 + 9; i+=9) {
+            HighlightCell(i);
+            for (int j = i; j < i + 3 ; j++) {
+                HighlightCell(j);
+            }
+        }
+    }
+
+    // Find the closest center (of a block) to the cell in the given index
+    private int FindCenter(int index) {
+        List<int> candidateCenters = new List<int>();
+        foreach (int i in BLOCK_CENTER_INDICES) {
+            if (Mathf.Abs(index - i) <= 10) {
+                candidateCenters.Add(i);
+            }
+        }
+
+        if (candidateCenters.Count == 1)
+            return candidateCenters[0];
+
+        float shortestDistance = Mathf.Infinity;
+        int shortestDistanceIndex = 82;
+        foreach (int i in candidateCenters) {
+            float distance = Vector2.Distance(cells[i].transform.position, cells[index].transform.position);
+            if (distance < shortestDistance) {
+                shortestDistance = distance;
+                shortestDistanceIndex = i;
+            }
+        }
+        return shortestDistanceIndex;
     }
 }
